@@ -1,16 +1,20 @@
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Category, Post
-from django.views.generic import CreateView, ListView, DetailView
+from .froms import PostForm, CommentForm
+from .models import Category, Post, Comment
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 
-
-POSTS_PAGINATION = 5
+# main page view settings
+POSTS_PAGINATION = 10
 POSTS_ORDERING = 'pub_date'
-PAGINATOR_CATEGORY = 5
+PAGINATOR_CATEGORY = 10
+
+User = get_user_model()
 
 
 class PostListView(ListView):
@@ -28,7 +32,6 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'blog/detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -36,7 +39,7 @@ class PostDetailView(DetailView):
         return context
 
 
-class PostCreateView(CreateView, LoginRequiredMixin):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = [
         'title',
@@ -44,14 +47,11 @@ class PostCreateView(CreateView, LoginRequiredMixin):
         'location',
         'category',
     ]
-    template_name = 'blog/create.html'
     success_url = reverse_lazy('blog:index')
 
 
 class PostCategoryView(ListView):
     model = Post
-    template_name = 'blog/category.htmi'
-    context_object_name = 'page_obj'
     paginate_by = PAGINATOR_CATEGORY
 
     def get_context_data(self, **kwargs):
@@ -69,3 +69,52 @@ class PostCategoryView(ListView):
         )
         return self.category.posts.all()
 
+
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+
+    def dispatch(self, request, *args, **kwargs):
+        get_object_or_404(Post, pk=kwargs['pk'], author=request.user)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('blog:post_detail', kwargs={'pk': self.object.pk})
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    post = None
+    model = Comment
+    form_class = CommentForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.post = get_object_or_404(Post, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = self.post
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('post:post_detail', kwargs={'pk': self.post.pk})
+
+
+class CommentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+
+    def dispatch(self, request, *args, **kwargs):
+        get_object_or_404(Comment, pk=kwargs['pk'], author=request.user)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('blog:post_detail', kwargs={'pk': self.object.pk})
+
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    model = User
+
+    def dispatch(self, request, *args, **kwargs):
+        get_object_or_404(User, id=kwargs['user_id'], author=request.user)
+        return super().dispatch(request, *args, **kwargs)

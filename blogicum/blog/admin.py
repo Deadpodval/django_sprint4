@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Category, Location, Post, BlogUser
+from .models import Category, Location, Post
 
 
 @admin.register(Post)
@@ -18,6 +18,3 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     pass
-
-
-admin.site.register(BlogUser, UserAdmin)

@@ -48,7 +48,6 @@ class Post(BlogModel):
     )
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
-        
         verbose_name='Дата и время публикации',
         help_text='Если установить дату и время '
                   'в будущем — можно делать '
@@ -60,7 +59,6 @@ class Post(BlogModel):
         verbose_name='Автор публикации',
         related_name='authors',
         related_query_name='author',
-        null=True
     )
 
     location = models.ForeignKey(
@@ -79,24 +77,32 @@ class Post(BlogModel):
         related_name='categories',
         related_query_name='category',
     )
+    image = models.ImageField('Фото',
+                              upload_to='birthdays_images',
+                              blank=True,
+                              null=True)
 
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.title
 
 
 class Comment(BlogModel):
-    text = models.TextField('Комментарий')
-    birthday = models.ForeignKey(
+    text = models.TextField('Текст комментария')
+    post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='comment',
+        related_name='comments',
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
-        ordering = ('created_at',)
+        ordering = ['-created_at']

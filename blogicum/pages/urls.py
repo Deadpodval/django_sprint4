@@ -1,7 +1,6 @@
 from django.urls import path
 from django.views.generic import TemplateView as Tv
 
-
 app_name = "pages"
 
 

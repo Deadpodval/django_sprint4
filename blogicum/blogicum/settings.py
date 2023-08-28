@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-gu=w2#$p8ugpauuh8l1k!3p*n(fb%-$!&#2#ng-zemp*bb2zn3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost'
+]
 
 
 # Application definition
@@ -35,7 +38,6 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'blog.apps.BlogConfig',
     'pages.apps.PagesConfig',
-    'users.apps.UsersConfig',
     'core.apps.CoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +56,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+'''INTERNAL_IPS = [
+    '127.0.0.1',
+]'''
 
 ROOT_URLCONF = 'blogicum.urls'
 
@@ -119,7 +127,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -136,9 +144,15 @@ STATICFILES_DIRS = ['static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.BlogUser'
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.<тип бэкенда>.EmailBackend'
+
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
-LOGIN_REDIRECT_URL = 'pages:homepage'
+
+LOGIN_REDIRECT_URL = 'blog:index'
+
 LOGIN_URL = 'login'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+

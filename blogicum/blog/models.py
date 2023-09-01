@@ -92,8 +92,8 @@ class Post(BlogModel):
 
 
 class Comment(BlogModel):
-    text = models.TextField('Текст комментария')
-    post = models.ForeignKey(
+    text = models.TextField('Текст комментария', null=False)
+    blog_post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
         related_name='comments',

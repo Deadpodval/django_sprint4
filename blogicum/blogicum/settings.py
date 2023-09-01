@@ -127,7 +127,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -144,7 +144,7 @@ STATICFILES_DIRS = ['static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
+CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 
 EMAIL_BACKEND = 'django.core.mail.backends.<тип бэкенда>.EmailBackend'
 
@@ -155,4 +155,3 @@ LOGIN_REDIRECT_URL = 'blog:index'
 LOGIN_URL = 'login'
 
 MEDIA_ROOT = BASE_DIR / 'media'
-

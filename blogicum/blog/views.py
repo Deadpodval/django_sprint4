@@ -32,7 +32,6 @@ class PostsDetailView(DetailView):
         ).filter(
             blog_post=blog_post
         )
-        context['comment_count'] = len(context['comments'])
         return context
 
 
@@ -152,8 +151,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 
 class CommentUpdateView(LoginRequiredMixin, CreateView):
-    blog_post = None
-    comment = None
     model = Comment
     form_class = CommentForm
 
@@ -162,11 +159,6 @@ class CommentUpdateView(LoginRequiredMixin, CreateView):
             Comment,
             pk=self.kwargs.get('comment_id'),
             author=self.request.user)
-
-    '''def dispatch(self, request, *args, **kwargs):
-        self.blog_post = Post.objects.get(pk=self.kwargs['post_id'])
-        self.comment = Comment.objects.get(pk=self.kwargs['comment_id'])
-        return super().dispatch(request, *args, **kwargs)'''
 
     def form_valid(self, form):
         if form.is_valid():

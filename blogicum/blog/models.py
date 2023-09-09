@@ -80,7 +80,7 @@ class Post(BlogModel):
     image = models.ImageField('Фото',
                               upload_to='birthdays_images',
                               blank=True,
-                              null=True)
+                              )
 
     class Meta:
         verbose_name = 'публикация'
@@ -105,4 +105,4 @@ class Comment(BlogModel):
     )
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['created_at']

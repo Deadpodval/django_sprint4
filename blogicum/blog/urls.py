@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views as p_views
 
+
 app_name = 'blog'
 
 urlpatterns = [

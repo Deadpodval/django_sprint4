@@ -112,6 +112,7 @@ class PostsListView(ListView):
     ordering = '-pub_date'
 
     queryset = Post.objects.select_related(
+        'author',
         'location',
         'category',
     ).filter(is_published=True,
@@ -135,11 +136,14 @@ class CategoryListView(ListView):
 
     def get_queryset(self):
         return Post.objects.prefetch_related(
-                'category',).filter(
-                category=self.category.id,
-                is_published=True,
-                pub_date__lte=datetime.now(),
-            ).order_by('-pub_date')
+            'author',
+            'location',
+            'category',
+        ).filter(
+            category=self.category.id,
+            is_published=True,
+            pub_date__lte=datetime.now(),
+        ).order_by('-pub_date')
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -232,13 +236,21 @@ class UserDetailView(ListView):
         )
 
         if self.author != self.request.user:
-            return Post.objects.filter(
+            return Post.objects.select_related(
+                'author',
+                'location',
+                'category',
+            ).filter(
                 author=self.author,
                 is_published=True
             ).order_by(
                 '-pub_date')
 
-        return Post.objects.filter(
+        return Post.objects.select_related(
+            'author',
+            'location',
+            'category',
+        ).filter(
                 author=self.author).order_by(
                 '-pub_date')
 

@@ -249,10 +249,8 @@ class UserDetailView(ListView):
         return Post.objects.select_related(
             'author',
             'location',
-            'category',
-        ).filter(
-                author=self.author).order_by(
-                '-pub_date')
+            'category',).filter(
+            author=self.author).order_by('-pub_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

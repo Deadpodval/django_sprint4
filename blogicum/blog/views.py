@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -13,12 +12,9 @@ from django.views.generic import (
     UpdateView,
 )
 
+from .utils import filter_published
 from .forms import CommentForm, PasswordChangeForm, PostForm, UserForm
-from .models import Category, Comment, Post
-
-
-User = get_user_model()
-
+from .models import Category, Comment, Post, User
 
 POSTS_AMOUNT: int = 10
 
@@ -109,15 +105,22 @@ class PostsListView(ListView):
     model = Post
     template_name = 'blog/index.html'
     paginate_by: int = POSTS_AMOUNT
-    ordering = '-pub_date'
 
-    queryset = Post.objects.select_related(
-        'author',
-        'location',
-        'category',
-    ).filter(is_published=True,
-             category__is_published=True,
-             pub_date__lte=datetime.now())
+    def get_queryset(self):
+        """
+        обращение к ревьюеру:
+        вопрос по оптимизации запросов
+        не могу понять откуда столько дублирования
+        или не всегда дублирование запросов
+        удаётся избежать?
+        """
+        return filter_published(Post.objects.select_related(
+            'author',
+            'location',
+            'category',
+        ).filter(category__is_published=True,
+                 pub_date__lte=datetime.now())
+                                ).order_by('-pub_date')
 
 
 class CategoryListView(ListView):
@@ -135,15 +138,14 @@ class CategoryListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Post.objects.prefetch_related(
+        return filter_published(Post.objects.prefetch_related(
             'author',
             'location',
             'category',
         ).filter(
             category=self.category.id,
-            is_published=True,
             pub_date__lte=datetime.now(),
-        ).order_by('-pub_date')
+        )).order_by('-pub_date')
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -190,13 +192,12 @@ class CommentUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, **kwargs):
         if not self.request.user.is_authenticated:
             raise Http404
-        else:
-            return get_object_or_404(
-                Comment,
-                pk=self.kwargs.get('comment_id'),
-                post=Post.objects.get(pk=self.kwargs.get('post_id')),
-                author=self.request.user
-            )
+        return get_object_or_404(
+            Comment,
+            pk=self.kwargs.get('comment_id'),
+            post=Post.objects.get(pk=self.kwargs.get('post_id')),
+            author=self.request.user
+        )
 
     def get_success_url(self):
         return reverse(
@@ -236,20 +237,19 @@ class UserDetailView(ListView):
         )
 
         if self.author != self.request.user:
-            return Post.objects.select_related(
+            return filter_published(Post.objects.select_related(
                 'author',
                 'location',
                 'category',
             ).filter(
                 author=self.author,
-                is_published=True
-            ).order_by(
+            )).order_by(
                 '-pub_date')
 
         return Post.objects.select_related(
             'author',
             'location',
-            'category',).filter(
+            'category', ).filter(
             author=self.author).order_by('-pub_date')
 
     def get_context_data(self, **kwargs):

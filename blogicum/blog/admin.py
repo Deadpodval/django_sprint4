@@ -12,9 +12,13 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['title', 'description']
+    search_fields = ['title', 'description']
+    list_filter = ['title', 'description']
 
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['name']
+    search_fields = ['name']
+    list_filter = ['name']

@@ -5,10 +5,15 @@ from core.models import BlogModel
 
 
 User = get_user_model()
+TITLE_MAX_LENGTH: int = 256
+TITLE_SHORT: int = 40
 
 
 class Category(BlogModel):
-    title = models.CharField(max_length=256, verbose_name='Заголовок')
+    title = models.CharField(
+        max_length=TITLE_MAX_LENGTH,
+        verbose_name='Заголовок'
+    )
     description = models.TextField(verbose_name='Описание')
     slug = models.SlugField(
         unique=True,
@@ -28,7 +33,7 @@ class Category(BlogModel):
 
 class Location(BlogModel):
     name = models.CharField(
-        max_length=256,
+        max_length=TITLE_MAX_LENGTH,
         verbose_name='Название места'
     )
 
@@ -42,7 +47,7 @@ class Location(BlogModel):
 
 class Post(BlogModel):
     title = models.CharField(
-        max_length=256,
+        max_length=TITLE_MAX_LENGTH,
         null=False,
         verbose_name='Заголовок'
     )
@@ -57,8 +62,8 @@ class Post(BlogModel):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор публикации',
-        related_name='authors',
-        related_query_name='author',
+        related_name='posts',
+        related_query_name='post',
     )
 
     location = models.ForeignKey(
@@ -66,16 +71,16 @@ class Post(BlogModel):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Местоположение',
-        related_name='locations',
-        related_query_name='location',
+        related_name='posts',
+        related_query_name='post',
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Категория',
-        related_name='categories',
-        related_query_name='category',
+        related_name='posts',
+        related_query_name='post',
     )
     image = models.ImageField('Фото',
                               upload_to='birthdays_images',
@@ -88,7 +93,7 @@ class Post(BlogModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        return self.title
+        return self.title[:TITLE_SHORT]
 
 
 class Comment(BlogModel):

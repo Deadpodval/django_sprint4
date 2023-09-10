@@ -109,13 +109,15 @@ class PostsListView(ListView):
         или не всегда дублирование запросов
         удаётся избежать?
         """
-        return filter_published(Post.objects.select_related(
-            'author',
-            'location',
-            'category',
-        ).filter(category__is_published=True,
-                 pub_date__lte=datetime.now())
-                                ).order_by('-pub_date')
+        return filter_published(
+            Post.objects.select_related(
+                'author',
+                'location',
+                'category',
+            ).filter(
+                category__is_published=True,
+                pub_date__lte=datetime.now())
+        ).order_by('-pub_date')
 
 
 class CategoryListView(ListView):

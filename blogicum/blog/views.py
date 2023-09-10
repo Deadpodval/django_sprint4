@@ -4,17 +4,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    UpdateView,
-)
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 
-from .utils import filter_published
 from .forms import CommentForm, PasswordChangeForm, PostForm, UserForm
 from .models import Category, Comment, Post, User
+from .utils import filter_published
 
 POSTS_AMOUNT: int = 10
 

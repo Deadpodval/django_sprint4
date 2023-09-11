@@ -4,12 +4,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from .forms import CommentForm, PasswordChangeForm, PostForm, UserForm
 from .models import Category, Comment, Post, User
-from .utils import filter_published
+from .utils import filter_published, select_post_objects
 
 POSTS_AMOUNT: int = 10
 
@@ -102,19 +107,8 @@ class PostsListView(ListView):
     paginate_by: int = POSTS_AMOUNT
 
     def get_queryset(self):
-        """
-        обращение к ревьюеру:
-        вопрос по оптимизации запросов
-        не могу понять откуда столько дублирования
-        или не всегда дублирование запросов
-        удаётся избежать?
-        """
         return filter_published(
-            Post.objects.select_related(
-                'author',
-                'location',
-                'category',
-            ).filter(
+            select_post_objects(Post).filter(
                 category__is_published=True,
                 pub_date__lte=datetime.now())
         ).order_by('-pub_date')
@@ -135,11 +129,7 @@ class CategoryListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return filter_published(Post.objects.prefetch_related(
-            'author',
-            'location',
-            'category',
-        ).filter(
+        return filter_published(select_post_objects(Post).filter(
             category=self.category.id,
             pub_date__lte=datetime.now(),
         )).order_by('-pub_date')
@@ -234,20 +224,14 @@ class UserDetailView(ListView):
         )
 
         if self.author != self.request.user:
-            return filter_published(Post.objects.select_related(
-                'author',
-                'location',
-                'category',
-            ).filter(
+            return filter_published(select_post_objects(Post).filter(
                 author=self.author,
             )).order_by(
                 '-pub_date')
 
-        return Post.objects.select_related(
-            'author',
-            'location',
-            'category', ).filter(
-            author=self.author).order_by('-pub_date')
+        return select_post_objects(Post).filter(
+            author=self.author
+        ).order_by('-pub_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

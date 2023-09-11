@@ -1,7 +1,7 @@
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-gu=w2#$p8ugpauuh8l1k!3p*n(fb%-$!&#2#ng-zemp*bb2zn3'
 
@@ -11,7 +11,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost'
 ]
-
 
 INSTALLED_APPS = [
     'django_bootstrap5',
@@ -64,14 +63,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blogicum.wsgi.application'
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -88,7 +85,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
@@ -99,13 +95,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 STATIC_ROOT = ''
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ['static']
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

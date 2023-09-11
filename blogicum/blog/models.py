@@ -1,6 +1,8 @@
-from core.models import BlogModel
 from django.contrib.auth import get_user_model
 from django.db import models
+
+from core.models import BlogModel
+
 
 User = get_user_model()
 TITLE_MAX_LENGTH: int = 256
